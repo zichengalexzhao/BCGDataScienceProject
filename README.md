@@ -8,8 +8,8 @@
 ## Procedure
 ### Step 1. Exploratory Data Analysis(EDA)
 Here are 3 data sets:
-1. [Historical customer data](Datasets/client_data (1)): Customer data such as usage, sign up date, forecasted usage etc.
-2. Historical pricing data: variable and fixed pricing data etc.
+1. [Historical customer data](Datasets/client_data.csv): Customer data such as usage, sign up date, forecasted usage etc.
+2. [Historical pricing data](Datasets/price_data.csv): variable and fixed pricing data etc.
 3. Churn indicator: whether each customer has churned or not.
 
 Analyze the following using Python:
