@@ -6,7 +6,7 @@
 - This is becoming a big issue for PowerCo and they have engaged BCG to help diagnose the reason why their customers are churning.
 
 ## Procedure
-### Step 1. Exploratory Data Analysis(EDA)
+### Step 1. [Exploratory Data Analysis(EDA)](DataAnalysis/EDA)
 Here are 3 data sets:
 1. [Historical customer data](Datasets/client_data.csv): Customer data such as usage, sign up date, forecasted usage etc.
 2. [Historical pricing data](Datasets/price_data.csv): variable and fixed pricing data etc.
@@ -17,9 +17,9 @@ Analyze the following using Python:
 2. Descriptive statistics of the dataset.
 3. Distributions of columns.
 
-### Step 2. Feature Engineering
+### Step 2. [Feature Engineering](DataAnalysis/Feature_Engineering)
 
-### Step 3. Predict Churn
+### Step 3. [Predict Churn](DataAnalysis/Modeling)
 Use Random Forest Regression Model to predict churn rate
 
 ### Step 4. Data Interpretation
