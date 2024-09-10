@@ -1,50 +1,123 @@
-# [BCG - Data Science Project](https://www.theforage.com/simulations/bcg/data-science-ccdz)
+# PowerCo Customer Churn Prediction - BCG Data Science Project
 
----
+*[Project Link](https://www.theforage.com/simulations/bcg/data-science-ccdz)*
 
 ## Project Background
-- PowerCo - a major gas and electricity utility that supplies to small and medium sized enterprises.  
-- The energy market has had a lot of change in recent years and there are more options than ever for customers to choose from.  
-- PowerCo are concerned about their customers leaving for better offers from other energy providers. When a customer leaves to use another service provider, which is called churn.  
-- This is becoming a big issue for PowerCo and they have engaged BCG to help diagnose the reason why their customers are churning.
+
+PowerCo, a leading gas and electricity utility serving small and medium-sized enterprises (SMEs), is facing increasing customer churn due to a highly competitive energy market. Customers are leaving for better offers, making it imperative to understand and predict churn behavior.
+
+The primary goal of this project is to analyze customer churn for PowerCo, diagnose the factors driving churn, and develop a predictive model to prevent future churn. Boston Consulting Group (BCG) was engaged to provide this analysis, focusing on the SME division.
 
 ---
 
-## Procedure
+## Procedure Overview
 
+### 1. [Exploratory Data Analysis (EDA)](DataAnalysis/EDA)
 
+Started by performing an exploratory analysis of the data, which consisted of:
+- **Historical customer data**: Usage, signup date, forecasted usage, and more.
+- **Pricing data**: Both variable and fixed pricing details.
+- **Churn data**: Whether each customer has churned or not.
 
-### Step 1. [Exploratory Data Analysis(EDA)](DataAnalysis/EDA)
-Here are 3 data sets:
-1. [Historical customer data](Datasets/client_data.csv): Customer data such as usage, sign up date, forecasted usage etc.
-2. [Historical pricing data](Datasets/price_data.csv): variable and fixed pricing data etc.
-3. Churn indicator: whether each customer has churned or not.
+Key steps:
+- **Data types and descriptive statistics**: Understanding the structure of the data.
+- **Distribution of key variables**: Visualizing and analyzing the data for any patterns or anomalies.
 
-Analyze the following using Python:
-1. The data types of each column.
-2. Descriptive statistics of the dataset.
-3. Distributions of columns.
+### 2. [Feature Engineering](DataAnalysis/Feature_Engineering)
 
+In this step, I enriched the dataset by creating relevant features that can influence churn prediction, such as:
+- **Consumption patterns**: Yearly consumption, gas consumption, and forecasted consumption.
+- **Pricing variables**: Off-peak, peak, and mid-peak pricing for both fixed and variable rates over a six-month period.
+- **Customer tenure and channel sales data**: Duration of customer contracts and the channels through which customers were acquired.
 
+### 3. [Churn Prediction Model](DataAnalysis/Modeling)
 
-### Step 2. [Feature Engineering](DataAnalysis/Feature_Engineering)
+I built a **Random Forest Regression model** to predict the likelihood of customer churn. Key findings from the predictive analysis:
+- **Churn Rate**: 9.7% across 14,606 customers in the SME division.
+- **Main churn drivers**: Yearly consumption, forecasted consumption, and net margin.
+- **Price sensitivity** was not the primary driver for churn, contrary to initial expectations.
+  
+I also developed a **targeted discount strategy**:
+- Offering a 20% discount effectively reduces churn if targeted toward high-value customers who are most likely to leave.
 
+---
 
+## Data Visualizations
 
-### Step 3. [Predict Churn](DataAnalysis/Modeling)
-Use Random Forest Regression Model to predict churn rate
+```python
+def plot_stacked_bars(dataframe, title_, size_=(18, 10), rot_=0, legend_="upper right"):
+    """
+    Plot stacked bars with annotations
+    """
+    ax = dataframe.plot(
+        kind="bar",
+        stacked=True,
+        figsize=size_,
+        rot=rot_,
+        title=title_
+    )
 
+    # Annotate bars
+    annotate_stacked_bars(ax, textsize=14)
+    # Rename legend
+    plt.legend(["Retention", "Churn"], loc=legend_)
+    # Labels
+    plt.ylabel("Company base (%)")
+    plt.show()
 
+def annotate_stacked_bars(ax, pad=0.99, colour="white", textsize=13):
+    """
+    Add value annotations to the bars
+    """
 
-### Step 4. Data Interpretation
-**Churn is indeed high in the SME division**    
+    # Iterate over the plotted rectanges/bars
+    for p in ax.patches:
+        
+        # Calculate annotation
+        value = str(round(p.get_height(),1))
+        # If value is 0 do not annotate
+        if value == '0.0':
+            continue
+        ax.annotate(
+            value,
+            ((p.get_x()+ p.get_width()/2)*pad-0.05, (p.get_y()+p.get_height()/2)*pad),
+            color=colour,
+            size=textsize
+        )
 
-  • 9.7% across 14606 customers
+def plot_distribution(dataframe, column, ax, bins_=50):
+    """
+    Plot variable distirbution in a stacked histogram of churned or retained company
+    """
+    # Create a temporal dataframe with the data to be plot
+    temp = pd.DataFrame({"Retention": dataframe[dataframe["churn"]==0][column],
+    "Churn":dataframe[dataframe["churn"]==1][column]})
+    # Plot the histogram
+    temp[["Retention","Churn"]].plot(kind='hist', bins=bins_, ax=ax, stacked=True)
+    # X-axis label
+    ax.set_xlabel(column)
+    # Change the x-axis to plain style
+    ax.ticklabel_format(style='plain', axis='x')
 
-**Predictive model is able to predict churn but the main driver is not customer price sensitivity**     
+## Stacked Bar Plot for Churn Status
+churn = client_df[['id', 'churn']]
+churn.columns = ['Companies', 'churn']
+churn_total = churn.groupby(churn['churn']).count()
+churn_percentage = churn_total / churn_total.sum() * 100
+plot_stacked_bars(churn_percentage.transpose(), "Churning status", (5, 5), legend_="lower right")
 
-  • Yearly consumption, forecasted consumption and net margin are the 3 largest drivers
+## Stacked Histogram for Consumption Distribution
+consumption = client_df[['id', 'cons_12m', 'cons_gas_12m', 'cons_last_month', 'imp_cons', 'has_gas', 'churn']]
+fig, axs = plt.subplots(nrows=1, figsize=(18, 5))
+plot_distribution(consumption, 'cons_12m', axs)
+```
 
-**Discount strategy of 20% is effective but only if targeted appropriately**     
+### Stacked Bar Plot
+This visualizes the overall percentage of churned vs. retained customers, giving a high-level understanding of customer behavior.
 
-  • Offer discount to only to high-value customers with high churn probability
+![Churned vs. Retained Customers](file/Churning_Status.png)
+
+### Stacked Histogram Plot
+This breaks down how a specific feature is distributed across churned and retained customers, helping identify any patterns that differentiate churned customers from retained ones.
+
+![Consumption Distribution](file/Distribution.png)
